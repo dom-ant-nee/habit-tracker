@@ -166,7 +166,13 @@ export default function HabitManagement({
                           <span>{habit.name}</span>
                         </div>
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditHabit(habit)}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleEditHabit(habit)}
+                            aria-label={`Edit ${habit.name}`}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button
@@ -174,6 +180,7 @@ export default function HabitManagement({
                             size="icon"
                             className="h-8 w-8 text-destructive"
                             onClick={() => setDeleteHabitId(habit.id)}
+                            aria-label={`Delete ${habit.name}`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
