@@ -69,9 +69,9 @@ export default function ContributionGraph({ completionData, habits }: Contributi
           <div className="text-xs text-muted-foreground">Last 16 weeks</div>
         </div>
 
-        <div className="grid grid-flow-col gap-1 auto-cols-max">
+        <div className="grid grid-flow-col gap-1.5 auto-cols-max">
           {weeks.map((week, weekIndex) => (
-            <div key={weekIndex} className="grid grid-flow-row gap-1">
+            <div key={weekIndex} className="grid grid-flow-row gap-1.5">
               {week.map((date) => {
                 const percentage = getCompletionPercentage(date)
                 const colorClass = getColorClass(percentage)
@@ -81,7 +81,7 @@ export default function ContributionGraph({ completionData, habits }: Contributi
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div
-                          className={`w-3 h-3 rounded-sm ${colorClass} cursor-pointer transition-all hover:scale-125`}
+                          className={`w-5 h-5 rounded-sm ${colorClass} cursor-pointer transition-all hover:scale-125`}
                           onClick={() => setSelectedDate(isSameDay(date, selectedDate || new Date(0)) ? null : date)}
                         />
                       </TooltipTrigger>
@@ -102,12 +102,12 @@ export default function ContributionGraph({ completionData, habits }: Contributi
 
         <div className="flex justify-end items-center mt-2 gap-1 text-xs">
           <span className="text-muted-foreground">Less</span>
-          <div className="w-2 h-2 rounded-sm bg-muted" />
-          <div className="w-2 h-2 rounded-sm bg-emerald-200 dark:bg-emerald-900" />
-          <div className="w-2 h-2 rounded-sm bg-emerald-300 dark:bg-emerald-800" />
-          <div className="w-2 h-2 rounded-sm bg-emerald-400 dark:bg-emerald-700" />
-          <div className="w-2 h-2 rounded-sm bg-emerald-500 dark:bg-emerald-600" />
-          <div className="w-2 h-2 rounded-sm bg-emerald-600 dark:bg-emerald-500" />
+          <div className="w-4 h-4 rounded-sm bg-muted" />
+          <div className="w-4 h-4 rounded-sm bg-emerald-200 dark:bg-emerald-900" />
+          <div className="w-4 h-4 rounded-sm bg-emerald-300 dark:bg-emerald-800" />
+          <div className="w-4 h-4 rounded-sm bg-emerald-400 dark:bg-emerald-700" />
+          <div className="w-4 h-4 rounded-sm bg-emerald-500 dark:bg-emerald-600" />
+          <div className="w-4 h-4 rounded-sm bg-emerald-600 dark:bg-emerald-500" />
           <span className="text-muted-foreground">More</span>
         </div>
       </div>
