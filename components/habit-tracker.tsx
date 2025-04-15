@@ -20,6 +20,11 @@ export type Habit = {
   color?: string
 }
 
+/**
+ * Represents the structure for storing habit completion data.
+ * Keys are date strings in "yyyy-MM-dd" format.
+ * Values are arrays of completed habit IDs for that date.
+ */
 export type CompletionData = {
   [date: string]: string[] // Array of completed habit IDs
 }
@@ -31,6 +36,10 @@ const initialHabits: Habit[] = [
   { id: "3", name: "Read", icon: "book-open", color: "purple" },
 ]
 
+/**
+ * Main component for the Habit Tracker application.
+ * Manages habit state, completion data, and renders UI components.
+ */
 export default function HabitTracker() {
   const { toast } = useToast()
   const [habits, setHabits] = useState<Habit[]>(initialHabits)
@@ -82,6 +91,11 @@ export default function HabitTracker() {
     }
   }, [lastToggledHabit, toast]) // Add toast to dependency array
 
+  /**
+   * Toggles the completion status of a habit for the current day.
+   * Updates completion data and triggers a toast notification.
+   * @param habitId The ID of the habit to toggle.
+   */
   const toggleHabitCompletion = (habitId: string) => {
     let isCompleted = false
     setCompletionData((prev) => {
@@ -101,9 +115,12 @@ export default function HabitTracker() {
     setLastToggledHabit({ id: habitId, completed: isCompleted })
   }
 
-  // Function to handle deleting a habit and its completion data
+  /**
+   * Handles deleting a habit and removing its associated completion data.
+   * Updates habits list, completion data, and shows a confirmation toast.
+   * @param id The ID of the habit to delete.
+   */
   const handleDeleteHabit = (id: string) => {
-    console.log("Deleting habit with ID:", id);
     // Filter out the deleted habit from the habits list
     setHabits((prevHabits) => prevHabits.filter((h) => h.id !== id))
 
@@ -124,6 +141,10 @@ export default function HabitTracker() {
     })
   }
 
+  /**
+   * Gets the array of completed habit IDs for the current day.
+   * @returns An array of strings representing the IDs of completed habits for today.
+   */
   const getTodayCompletions = () => {
     return completionData[today] || []
   }
