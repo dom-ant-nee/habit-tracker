@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card } from "@/components/ui/card"
 import { Edit, Trash2, Plus } from "lucide-react"
-import * as Icons from "lucide-react"
+import { getIconComponent } from "@/lib/icons"
 import HabitForm from "./habit-form"
 
 interface HabitManagementProps {
@@ -157,31 +157,34 @@ export default function HabitManagement({ habits, setHabits, completionData, set
                 <p className="text-sm text-muted-foreground">No habits yet. Add your first habit below.</p>
               ) : (
                 <div className="grid gap-2">
-                  {habits.map((habit) => (
-                    <Card key={habit.id} className="p-3 flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        {habit.icon && Icons[habit.icon as keyof typeof Icons] && (
-                          <span className={`text-${habit.color || "primary"}`}>
-                            {React.createElement(Icons[habit.icon as keyof typeof Icons] as React.ElementType, { size: 16 })}
-                          </span>
-                        )}
-                        <span>{habit.name}</span>
-                      </div>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditHabit(habit)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-destructive"
-                          onClick={() => setDeleteHabitId(habit.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </Card>
-                  ))}
+                  {habits.map((habit) => {
+                    const IconComponent = getIconComponent(habit.icon)
+                    return (
+                      <Card key={habit.id} className="p-3 flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          {IconComponent && (
+                            <span className={`text-${habit.color || "primary"}`}>
+                              <IconComponent size={16} />
+                            </span>
+                          )}
+                          <span>{habit.name}</span>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditHabit(habit)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive"
+                            onClick={() => setDeleteHabitId(habit.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </Card>
+                    )
+                  })}
                 </div>
               )}
             </div>

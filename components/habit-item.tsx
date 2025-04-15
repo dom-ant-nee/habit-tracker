@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import type { Habit } from "@/components/habit-tracker"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card } from "@/components/ui/card"
-import * as Icons from "lucide-react"
+import { getIconComponent } from "@/lib/icons"
 
 interface HabitItemProps {
   habit: Habit
@@ -16,8 +16,8 @@ interface HabitItemProps {
 export default function HabitItem({ habit, isCompleted, onToggle }: HabitItemProps) {
   const [isAnimating, setIsAnimating] = useState(false)
 
-  // Get the icon component if it exists
-  const IconComponent = habit.icon ? (Icons as any)[habit.icon] : null
+  // Get the icon component using the helper
+  const IconComponent = getIconComponent(habit.icon)
 
   const handleToggle = () => {
     // setIsAnimating(true) // Temporarily comment out

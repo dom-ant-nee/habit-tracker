@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import * as Icons from "lucide-react"
+import { getIconComponent } from "@/lib/icons"
 
 // Define props for the HabitForm component
 interface HabitFormProps {
@@ -43,14 +44,17 @@ export default function HabitForm({ habitData, setHabitData, iconOptions, colorO
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">None</SelectItem>
-                {iconOptions.map((icon) => (
-                  <SelectItem key={icon} value={icon}>
-                    <div className="flex items-center gap-2">
-                      {React.createElement(Icons[icon as keyof typeof Icons] as React.ElementType, { size: 16 })}
-                      <span>{icon}</span>
-                    </div>
-                  </SelectItem>
-                ))}
+                {iconOptions.map((icon) => {
+                  const IconComponent = getIconComponent(icon)
+                  return (
+                    <SelectItem key={icon} value={icon}>
+                      <div className="flex items-center gap-2">
+                        {IconComponent && <IconComponent size={16} />}
+                        <span>{icon}</span>
+                      </div>
+                    </SelectItem>
+                  )
+                })}
               </SelectContent>
             </Select>
           </div>
