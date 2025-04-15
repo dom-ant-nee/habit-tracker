@@ -28,13 +28,18 @@ import HabitForm from "./habit-form"
 interface HabitManagementProps {
   habits: Habit[]
   setHabits: React.Dispatch<React.SetStateAction<Habit[]>>
-  completionData: CompletionData
-  setCompletionData: React.Dispatch<React.SetStateAction<CompletionData>>
+  onDeleteHabit: (id: string) => void
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function HabitManagement({ habits, setHabits, completionData, setCompletionData, isOpen, setIsOpen }: HabitManagementProps) {
+export default function HabitManagement({
+  habits,
+  setHabits,
+  onDeleteHabit,
+  isOpen,
+  setIsOpen,
+}: HabitManagementProps) {
   const { toast } = useToast()
   const [newHabit, setNewHabit] = useState<Partial<Habit>>({ name: "", icon: "", color: "" })
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null)
@@ -116,28 +121,6 @@ export default function HabitManagement({ habits, setHabits, completionData, set
       name: habit.name,
       icon: habit.icon || "",
       color: habit.color || "",
-    })
-  }
-
-  const handleDeleteHabit = (id: string) => {
-    // Filter out the deleted habit from the habits list
-    setHabits(habits.filter((h) => h.id !== id))
-
-    // Remove the deleted habit's ID from completion data for all dates
-    setCompletionData((prevData) => {
-      const newData = { ...prevData }
-      for (const date in newData) {
-        if (newData[date].includes(id)) {
-          newData[date] = newData[date].filter((habitId) => habitId !== id)
-        }
-      }
-      return newData
-    })
-
-    setDeleteHabitId(null)
-    toast({
-      title: "Habit deleted",
-      description: "The habit has been removed from your list.",
     })
   }
 
@@ -235,7 +218,7 @@ export default function HabitManagement({ habits, setHabits, completionData, set
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => deleteHabitId && handleDeleteHabit(deleteHabitId)}
+              onClick={() => deleteHabitId && onDeleteHabit(deleteHabitId)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete

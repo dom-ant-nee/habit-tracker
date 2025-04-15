@@ -101,6 +101,29 @@ export default function HabitTracker() {
     setLastToggledHabit({ id: habitId, completed: isCompleted })
   }
 
+  // Function to handle deleting a habit and its completion data
+  const handleDeleteHabit = (id: string) => {
+    console.log("Deleting habit with ID:", id);
+    // Filter out the deleted habit from the habits list
+    setHabits((prevHabits) => prevHabits.filter((h) => h.id !== id))
+
+    // Remove the deleted habit's ID from completion data for all dates
+    setCompletionData((prevData) => {
+      const newData = { ...prevData }
+      for (const date in newData) {
+        if (newData[date].includes(id)) {
+          newData[date] = newData[date].filter((habitId) => habitId !== id)
+        }
+      }
+      return newData
+    })
+
+    toast({
+      title: "Habit deleted",
+      description: "The habit has been removed from your list.",
+    })
+  }
+
   const getTodayCompletions = () => {
     return completionData[today] || []
   }
@@ -153,8 +176,7 @@ export default function HabitTracker() {
       <HabitManagement
         habits={habits}
         setHabits={setHabits}
-        completionData={completionData}
-        setCompletionData={setCompletionData}
+        onDeleteHabit={handleDeleteHabit}
         isOpen={isManagementOpen}
         setIsOpen={setIsManagementOpen}
       />
