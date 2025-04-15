@@ -8,15 +8,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import * as Icons from "lucide-react"
 import { getIconComponent } from "@/lib/icons"
 
-// Define props for the HabitForm component
+/**
+ * Props for the HabitForm component.
+ */
 interface HabitFormProps {
+  /** The current data for the habit being added/edited (can be partial). */
   habitData: Partial<Habit>
+  /** Function to update the habit data state in the parent component. */
   setHabitData: React.Dispatch<React.SetStateAction<Partial<Habit>>>
+  /** Array of available icon names (lowercase/kebab-case). */
   iconOptions: string[]
+  /** Array of available color options. */
   colorOptions: { name: string; value: string }[]
+  /** Boolean indicating if the form is in edit mode. */
   isEditing: boolean
 }
 
+/**
+ * Renders the form fields for adding or editing a habit (name, icon, color).
+ */
 export default function HabitForm({ habitData, setHabitData, iconOptions, colorOptions, isEditing }: HabitFormProps) {
   return (
     <div className="space-y-4">

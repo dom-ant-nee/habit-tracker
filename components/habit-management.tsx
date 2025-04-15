@@ -25,14 +25,27 @@ import { Edit, Trash2, Plus } from "lucide-react"
 import { getIconComponent } from "@/lib/icons"
 import HabitForm from "./habit-form"
 
+/**
+ * Props for the HabitManagement component.
+ */
 interface HabitManagementProps {
+  /** Array of current habits. */
   habits: Habit[]
+  /** Function to update the habits array. */
   setHabits: React.Dispatch<React.SetStateAction<Habit[]>>
+  /** Callback function to handle habit deletion. */
   onDeleteHabit: (id: string) => void
+  /** State controlling the visibility of the management dialog. */
   isOpen: boolean
+  /** Function to update the visibility state of the management dialog. */
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
+/**
+ * Component responsible for rendering the habit management dialog.
+ * Allows users to view, add, edit, and delete habits.
+ * Includes the list of habits, the add/edit form, and the delete confirmation dialog.
+ */
 export default function HabitManagement({
   habits,
   setHabits,

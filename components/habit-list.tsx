@@ -8,13 +8,25 @@ import { EmptyPlaceholder } from "@/components/empty-placeholder"
 import { PlusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
+/**
+ * Props for the HabitList component.
+ */
 interface HabitListProps {
+  /** Array of all habits to potentially display. */
   habits: Habit[]
+  /** Array of IDs for habits completed today. */
   completedHabits: string[]
+  /** Callback function to toggle a habit's completion status. */
   onToggleHabit: (habitId: string) => void
+  /** Callback function to open the habit management modal. */
   onOpenManagement: () => void
 }
 
+/**
+ * Renders the list of habits for the current day.
+ * Shows an empty placeholder if no habits exist.
+ * Allows filtering completed habits.
+ */
 export default function HabitList({
   habits,
   completedHabits,

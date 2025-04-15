@@ -7,12 +7,22 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card } from "@/components/ui/card"
 import { getIconComponent } from "@/lib/icons"
 
+/**
+ * Props for the HabitItem component.
+ */
 interface HabitItemProps {
+  /** The habit data object. */
   habit: Habit
+  /** Whether the habit is currently marked as completed. */
   isCompleted: boolean
+  /** Callback function triggered when the checkbox is toggled. */
   onToggle: () => void
 }
 
+/**
+ * Renders a single habit item with a checkbox, icon (optional), and name.
+ * Handles visual state changes for completion (strikethrough, background).
+ */
 export default function HabitItem({ habit, isCompleted, onToggle }: HabitItemProps) {
   const [isAnimating, setIsAnimating] = useState(false)
 
