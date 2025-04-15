@@ -46,10 +46,10 @@ export default function HabitItem({ habit, isCompleted, onToggle }: HabitItemPro
           <Checkbox
             checked={isCompleted}
             onCheckedChange={handleToggle}
-            className={`h-6 w-6 rounded-full transition-all duration-300 ${
+            className={`h-6 w-6 rounded-full transition-all duration-300 data-[state=checked]:text-primary-foreground data-[state=checked]:bg-primary ${
               habit.color
-                ? `data-[state=checked]:bg-${habit.color}-500 data-[state=checked]:border-${habit.color}-500`
-                : ""
+                ? `data-[state=checked]:border-${habit.color}-500` // Only apply custom border
+                : "" // No extra border needed if no color
             }`}
           />
           {isAnimating && isCompleted && (
