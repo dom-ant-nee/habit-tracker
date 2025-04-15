@@ -3,9 +3,11 @@ import { ThemeProvider } from "@/components/theme-provider"
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
+  title: 'Habit Tracker',
+  description: 'Track your daily habits',
+  icons: {
+    icon: "/favicon.svg",
+  },
 }
 
 export default function RootLayout({
