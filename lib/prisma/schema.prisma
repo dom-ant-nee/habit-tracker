@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  // It's often cleaner to generate the client into node_modules
+  // or a dedicated lib folder. Let's use lib/prisma for clarity.
+  output   = "../lib/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL") // Reads from .env file
+}
+
+// Represents a user-defined habit
+model Habit {
+  id    String  @id @default(cuid()) // Using CUID for unique IDs
+  name  String
+  icon  String? // Optional icon name
+  color String? // Optional color name
+
+  // Relation to Completion model (one habit can have many completions)
+  completions Completion[]
+}
+
+// Represents a single completion of a habit on a specific date
+model Completion {
+  date    String // Store date as "yyyy-MM-dd" string
+  habitId String // Foreign key referencing Habit
+
+  // Relation back to the Habit model
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade) // Cascade delete completions if habit is deleted
+
+  // Define a compound primary key: one completion per habit per date
+  @@id([date, habitId])
+}

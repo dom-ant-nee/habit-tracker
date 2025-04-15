@@ -1,11 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { motion } from "framer-motion"
-import type { Habit } from "@/components/habit-tracker"
+import type { Habit } from "@/lib/prisma/client"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card } from "@/components/ui/card"
 import { getIconComponent } from "@/lib/icons"
+import { toggleCompletion } from "@/lib/actions"
+import { format } from 'date-fns'
+import { useToast } from "@/hooks/use-toast"
 
 /**
  * Props for the HabitItem component.
@@ -15,25 +18,45 @@ interface HabitItemProps {
   habit: Habit
   /** Whether the habit is currently marked as completed. */
   isCompleted: boolean
-  /** Callback function triggered when the checkbox is toggled. */
-  onToggle: () => void
 }
 
 /**
  * Renders a single habit item with a checkbox, icon (optional), and name.
  * Handles visual state changes for completion (strikethrough, background).
+ * Calls a server action to toggle completion status.
  */
-export default function HabitItem({ habit, isCompleted, onToggle }: HabitItemProps) {
+export default function HabitItem({ habit, isCompleted }: HabitItemProps) {
+  const { toast } = useToast()
+  const [isPending, startTransition] = useTransition()
   const [isAnimating, setIsAnimating] = useState(false)
 
   // Get the icon component using the helper
   const IconComponent = getIconComponent(habit.icon)
 
   const handleToggle = () => {
-    // setIsAnimating(true) // Temporarily comment out
-    onToggle()
-    // Reset animation state after animation completes
-    // setTimeout(() => setIsAnimating(false), 600) // Temporarily comment out
+    // We can re-enable animation triggers if desired, but keep state local
+    // setIsAnimating(true) 
+    // setTimeout(() => setIsAnimating(false), 600)
+
+    startTransition(async () => {
+      const today = format(new Date(), "yyyy-MM-dd")
+      const result = await toggleCompletion(habit.id, today)
+
+      if (!result?.success) {
+        toast({ 
+          title: "Error", 
+          description: result?.error || "Failed to update habit.", 
+          variant: "destructive" 
+        })
+      } else {
+        // Optionally show success toast (already handled by HabitTracker effect, maybe remove that one?)
+        // For now, let's rely on the visual change + revalidation.
+        // toast({
+        //   title: result.completed ? "Habit completed! 🎉" : "Habit unmarked",
+        //   duration: 1500
+        // })
+      }
+    })
   }
 
   return (
@@ -56,10 +79,11 @@ export default function HabitItem({ habit, isCompleted, onToggle }: HabitItemPro
           <Checkbox
             checked={isCompleted}
             onCheckedChange={handleToggle}
+            disabled={isPending}
             className={`h-6 w-6 rounded-full transition-all duration-300 data-[state=checked]:text-primary-foreground data-[state=checked]:bg-primary ${
               habit.color
-                ? `data-[state=checked]:border-${habit.color}-500` // Only apply custom border
-                : "" // No extra border needed if no color
+                ? `data-[state=checked]:border-${habit.color}-500`
+                : ""
             }`}
           />
           {isAnimating && isCompleted && (

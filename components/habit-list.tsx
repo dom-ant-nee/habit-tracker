@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import type { Habit } from "@/components/habit-tracker"
+import type { Habit } from "@/lib/prisma/client"
 import HabitItem from "@/components/habit-item"
 import { EmptyPlaceholder } from "@/components/empty-placeholder"
 import { PlusCircle } from "lucide-react"
@@ -16,8 +16,6 @@ interface HabitListProps {
   habits: Habit[]
   /** Array of IDs for habits completed today. */
   completedHabits: string[]
-  /** Callback function to toggle a habit's completion status. */
-  onToggleHabit: (habitId: string) => void
   /** Callback function to open the habit management modal. */
   onOpenManagement: () => void
 }
@@ -26,11 +24,12 @@ interface HabitListProps {
  * Renders the list of habits for the current day.
  * Shows an empty placeholder if no habits exist.
  * Allows filtering completed habits.
+ * Note: Habit toggling is now handled within HabitItem via Server Actions.
+ * Note: Opening management modal is handled by a parent client component.
  */
 export default function HabitList({
   habits,
   completedHabits,
-  onToggleHabit,
   onOpenManagement,
 }: HabitListProps) {
   const [showCompleted, setShowCompleted] = useState(true)
@@ -44,7 +43,7 @@ export default function HabitList({
         description="You don't have any habits yet. Add your first habit to get started."
         icon={PlusCircle}
         action={
-          <Button variant="outline" className="mt-4" onClick={onOpenManagement}>
+          <Button variant="outline" className="mt-4" onClick={onOpenManagement} >
             Add your first habit
           </Button>
         }
@@ -67,7 +66,6 @@ export default function HabitList({
               <HabitItem
                 habit={habit}
                 isCompleted={completedHabits.includes(habit.id)}
-                onToggle={() => onToggleHabit(habit.id)}
               />
             </motion.div>
           ))}

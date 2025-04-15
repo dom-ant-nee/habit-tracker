@@ -1,9 +1,8 @@
 "use client"
 
 import React from "react"
-
-import { useState } from "react"
-import type { Habit, CompletionData } from "@/components/habit-tracker"
+import { useState, useTransition } from "react"
+import type { Habit } from "@prisma/client"
 import { useToast } from "@/hooks/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import {
@@ -24,17 +23,14 @@ import { Card } from "@/components/ui/card"
 import { Edit, Trash2, Plus } from "lucide-react"
 import { getIconComponent } from "@/lib/icons"
 import HabitForm from "./habit-form"
+import { addHabit, editHabit, deleteHabit } from "@/lib/actions"
 
 /**
  * Props for the HabitManagement component.
  */
 interface HabitManagementProps {
-  /** Array of current habits. */
+  /** Array of habits to display in the list (read-only in this context). */
   habits: Habit[]
-  /** Function to update the habits array. */
-  setHabits: React.Dispatch<React.SetStateAction<Habit[]>>
-  /** Callback function to handle habit deletion. */
-  onDeleteHabit: (id: string) => void
   /** State controlling the visibility of the management dialog. */
   isOpen: boolean
   /** Function to update the visibility state of the management dialog. */
@@ -44,16 +40,15 @@ interface HabitManagementProps {
 /**
  * Component responsible for rendering the habit management dialog.
  * Allows users to view, add, edit, and delete habits.
- * Includes the list of habits, the add/edit form, and the delete confirmation dialog.
+ * Uses Server Actions for mutations.
  */
 export default function HabitManagement({
   habits,
-  setHabits,
-  onDeleteHabit,
   isOpen,
   setIsOpen,
 }: HabitManagementProps) {
   const { toast } = useToast()
+  const [isPending, startTransition] = useTransition()
   const [newHabit, setNewHabit] = useState<Partial<Habit>>({ name: "", icon: "", color: "" })
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null)
   const [deleteHabitId, setDeleteHabitId] = useState<string | null>(null)
@@ -87,7 +82,7 @@ export default function HabitManagement({
     setEditingHabit(null)
   }
 
-  const handleAddHabit = () => {
+  const handleAddOrEditHabit = () => {
     if (!newHabit.name?.trim()) {
       toast({
         title: "Error",
@@ -97,35 +92,50 @@ export default function HabitManagement({
       return
     }
 
-    if (editingHabit) {
-      // Update existing habit
-      setHabits(
-        habits.map((h) =>
-          h.id === editingHabit.id
-            ? { ...h, name: newHabit.name || h.name, icon: newHabit.icon || h.icon, color: newHabit.color || h.color }
-            : h,
-        ),
-      )
-      toast({
-        title: "Habit updated",
-        description: `"${newHabit.name}" has been updated.`,
-      })
-    } else {
-      // Add new habit
-      const habit: Habit = {
-        id: Date.now().toString(),
-        name: newHabit.name,
-        icon: newHabit.icon || undefined,
-        color: newHabit.color || undefined,
+    startTransition(async () => {
+      let result
+      const habitData = {
+        name: newHabit.name || "",
+        icon: newHabit.icon || null,
+        color: newHabit.color || null,
       }
-      setHabits([...habits, habit])
-      toast({
-        title: "Habit added",
-        description: `"${habit.name}" has been added to your habits.`,
-      })
-    }
 
-    resetForm()
+      if (editingHabit) {
+        result = await editHabit(editingHabit.id, habitData)
+        if (result?.success) {
+          toast({
+            title: "Habit updated",
+            description: `"${habitData.name}" has been updated.`,
+          })
+          setIsOpen(false)
+        } else {
+          toast({
+            title: "Error updating habit",
+            description: result?.error || "An unknown error occurred.",
+            variant: "destructive",
+          })
+        }
+      } else {
+        result = await addHabit(habitData)
+        if (result?.success) {
+          toast({
+            title: "Habit added",
+            description: `"${habitData.name}" has been added to your habits.`,
+          })
+        } else {
+          toast({
+            title: "Error adding habit",
+            description: result?.error || "An unknown error occurred.",
+            variant: "destructive",
+          })
+        }
+      }
+      if (!editingHabit && result?.success) {
+         resetForm()
+      } else if (editingHabit) {
+         resetForm()
+      }
+    })
   }
 
   const handleEditHabit = (habit: Habit) => {
@@ -137,9 +147,33 @@ export default function HabitManagement({
     })
   }
 
+  const handleDeleteConfirmation = () => {
+    startTransition(async () => {
+      if (!deleteHabitId) {
+        console.error("Delete attempted with null ID");
+        toast({ title: "Error", description: "Invalid habit ID.", variant: "destructive" });
+        return;
+      }
+      const result = await deleteHabit(deleteHabitId as string)
+      if (result?.success) {
+        toast({
+          title: "Habit deleted",
+          description: "The habit has been removed from your list.",
+        })
+        setDeleteHabitId(null)
+      } else {
+        toast({
+          title: "Error deleting habit",
+          description: result?.error || "An unknown error occurred.",
+          variant: "destructive",
+        })
+      }
+    })
+  }
+
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) resetForm(); }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Manage Habits</DialogTitle>
@@ -192,7 +226,7 @@ export default function HabitManagement({
               )}
             </div>
 
-            {/* Add/Edit Form - Replaced with HabitForm component */}
+            {/* Add/Edit Form */}
             <HabitForm
               habitData={newHabit}
               setHabitData={setNewHabit}
@@ -204,21 +238,18 @@ export default function HabitManagement({
 
           <DialogFooter className="flex justify-between sm:justify-between">
             {editingHabit && (
-              <Button variant="ghost" onClick={resetForm}>
+              <Button variant="ghost" onClick={resetForm} disabled={isPending}>
                 Cancel Edit
               </Button>
             )}
             <div className="flex gap-2">
               <DialogClose asChild>
-                <Button variant="outline">Close</Button>
+                <Button variant="outline" disabled={isPending}>Close</Button>
               </DialogClose>
-              <Button onClick={handleAddHabit}>
-                {editingHabit ? (
-                  "Update Habit"
-                ) : (
+              <Button onClick={handleAddOrEditHabit} disabled={isPending}>
+                {isPending ? "Saving..." : (editingHabit ? "Update Habit" : 
                   <span className="flex items-center gap-1">
-                    <Plus className="h-4 w-4" />
-                    Add Habit
+                    <Plus className="h-4 w-4" /> Add Habit
                   </span>
                 )}
               </Button>
@@ -227,7 +258,7 @@ export default function HabitManagement({
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={!!deleteHabitId} onOpenChange={() => setDeleteHabitId(null)}>
+      <AlertDialog open={!!deleteHabitId} onOpenChange={(open) => !open && setDeleteHabitId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
@@ -236,9 +267,10 @@ export default function HabitManagement({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => deleteHabitId && onDeleteHabit(deleteHabitId)}
+              onClick={handleDeleteConfirmation}
+              disabled={isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
