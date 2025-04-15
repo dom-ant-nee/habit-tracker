@@ -1,19 +1,19 @@
 import React from "react"
 import * as Icons from "lucide-react"
 
-// Create a mapping from string names to actual Lucide components
+// Create a mapping from string names (lowercase) to actual Lucide components
 export const iconMap: { [key: string]: React.ElementType } = {
-  Droplet: Icons.Droplet,
-  Dumbbell: Icons.Dumbbell,
-  BookOpen: Icons.BookOpen,
-  Coffee: Icons.Coffee,
-  Heart: Icons.Heart,
-  Music: Icons.Music,
-  PenTool: Icons.PenTool,
-  Smartphone: Icons.Smartphone,
-  Sun: Icons.Sun,
-  Zap: Icons.Zap,
-  // Add any other icons you might use here
+  droplet: Icons.Droplet,
+  dumbbell: Icons.Dumbbell,
+  "book-open": Icons.BookOpen,
+  coffee: Icons.Coffee,
+  heart: Icons.Heart,
+  music: Icons.Music,
+  penTool: Icons.PenTool,
+  smartphone: Icons.Smartphone,
+  sun: Icons.Sun,
+  zap: Icons.Zap,
+  // Add any other icons you might use here (using lowercase keys)
 }
 
 // Helper function to get the icon component safely

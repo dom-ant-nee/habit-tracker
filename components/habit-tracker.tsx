@@ -12,6 +12,7 @@ import { Settings, BarChart2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { initialHabits } from "@/lib/constants"
 
 export type Habit = {
   id: string
@@ -28,13 +29,6 @@ export type Habit = {
 export type CompletionData = {
   [date: string]: string[] // Array of completed habit IDs
 }
-
-// Sample initial habits
-const initialHabits: Habit[] = [
-  { id: "1", name: "Drink Water", icon: "droplet", color: "blue" },
-  { id: "2", name: "Exercise", icon: "dumbbell", color: "green" },
-  { id: "3", name: "Read", icon: "book-open", color: "purple" },
-]
 
 /**
  * Main component for the Habit Tracker application.

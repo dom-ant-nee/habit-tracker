@@ -46,16 +46,16 @@ export default function HabitManagement({
   const [deleteHabitId, setDeleteHabitId] = useState<string | null>(null)
 
   const iconOptions = [
-    "Droplet",
-    "Dumbbell",
-    "BookOpen",
-    "Coffee",
-    "Heart",
-    "Music",
-    "PenTool",
-    "Smartphone",
-    "Sun",
-    "Zap",
+    "droplet",
+    "dumbbell",
+    "book-open",
+    "coffee",
+    "heart",
+    "music",
+    "penTool",
+    "smartphone",
+    "sun",
+    "zap",
   ]
 
   const colorOptions = [
